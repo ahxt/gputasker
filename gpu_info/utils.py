@@ -61,6 +61,7 @@ class GPUInfoUpdater:
             return max(self.utilization_history[uuid])
 
     def update_gpu_info(self):
+        
         server_list = GPUServer.objects.all()
         for server in server_list:
             try:
@@ -71,14 +72,29 @@ class GPUInfoUpdater:
                     server.valid = True
                     server.save()
                 for gpu in gpu_info_json['gpus']:
+                    # print( gpu )
+
+
+                    memory_used_self = 0
+                    for process in gpu["processes"]:
+                        if process["username"] == "han":
+                            memory_used_self += process["gpu_memory_usage"]
+                
+                    # print(memory_used_self, gpu['memory.used'])
+                    # print(memory_used_self/ gpu['memory.used'])
+
                     if GPUInfo.objects.filter(uuid=gpu['uuid']).count() == 0:
                         gpu_info = GPUInfo(
                             uuid=gpu['uuid'],
                             name=gpu['name'],
                             index=gpu['index'],
                             utilization=self.update_utilization(gpu['uuid'], gpu['utilization.gpu']),
+                            # utilization=73,
+                            # utilization_self=memory_used_self/gpu['memory.total'],
+                            # utilization_self=self.update_utilization(gpu['uuid'], gpu['utilization.gpu']),
                             memory_total=gpu['memory.total'],
                             memory_used=gpu['memory.used'],
+                            memory_used_self=memory_used_self,
                             processes='\n'.join(map(lambda x: json.dumps(x), gpu['processes'])),
                             complete_free=len(gpu['processes']) == 0,
                             server=server
@@ -87,8 +103,12 @@ class GPUInfoUpdater:
                     else:
                         gpu_info = GPUInfo.objects.get(uuid=gpu['uuid'])
                         gpu_info.utilization = self.update_utilization(gpu['uuid'], gpu['utilization.gpu'])
+                        # gpu_info.utilization = 73,
+                        # gpu_info.utilization_self = memory_used_self/gpu['memory.total']
+                        # gpu_info.utilization_self = self.update_utilization(gpu['uuid'], gpu['utilization.gpu'])
                         gpu_info.memory_total = gpu['memory.total']
                         gpu_info.memory_used = gpu['memory.used']
+                        gpu_info.memory_used_self = memory_used_self
                         gpu_info.complete_free = len(gpu['processes']) == 0
                         gpu_info.processes = '\n'.join(map(lambda x: json.dumps(x), gpu['processes']))
                         gpu_info.save()

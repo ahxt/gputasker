@@ -98,7 +98,7 @@ def run_task(task, available_server):
         task.save()
 
         # send email
-        send_task_start_email(running_log)
+        # send_task_start_email(running_log)
 
         # wait for return
         return_code = process.get_return_code()
@@ -111,10 +111,10 @@ def run_task(task, available_server):
         task.save()
 
         # send email
-        if return_code == 0:
-            send_task_finish_email(running_log)
-        else:
-            send_task_fail_email(running_log)
+        # if return_code == 0:
+        #     send_task_finish_email(running_log)
+        # else:
+        #     send_task_fail_email(running_log)
     except Exception:
         es = traceback.format_exc()
         task_logger.error(es)

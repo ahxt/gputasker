@@ -10,8 +10,8 @@ class GPUTaskRunningLogInline(admin.TabularInline):
 
     show_change_link = True
 
-    verbose_name = '运行记录'
-    verbose_name_plural = '运行记录'
+    verbose_name = 'Running Log'
+    verbose_name_plural = 'Running Log'
 
     def get_extra(self, request, obj, **kwargs):
         return 0
@@ -24,26 +24,26 @@ class GPUTaskRunningLogInline(admin.TabularInline):
 
     def color_status(self, obj):
         if obj.status == -1:
-            status = '运行失败'
+            status = 'Failed'
             color_code = 'red'
         elif obj.status == 1:
-            status = '运行中'
+            status = 'Runing'
             color_code = '#ecc849'
         elif obj.status == 2:
-            status = '已完成'
+            status = 'Finished'
             color_code = 'green'
         else:
-            status = '未知状态'
+            status = 'None'
             color_code = 'red'
         return format_html('<span style="color:{};">{}</span>', color_code, status)
 
-    color_status.short_description = '状态'
+    color_status.short_description = 'status'
     color_status.admin_order_field = 'status'
 
 
 @admin.register(GPUTask)
 class GPUTaskAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name', 'workspace', 'cmd', 'gpu_requirement', 'exclusive_gpu', 'memory_requirement', 'utilization_requirement', 'assign_server', 'priority', 'color_status', 'create_at', 'update_at',)
+    list_display = ('id', 'name', "traial", 'color_status', 'workspace',  'gpu_requirement', 'exclusive_gpu', 'memory_requirement', 'utilization_requirement', 'assign_server', 'priority',  'create_at', 'update_at', 'cmd')
     list_filter = ('gpu_requirement', 'status', 'assign_server', 'priority')
     search_fields = ('name', 'status',)
     list_display_links = ('name',)
@@ -77,26 +77,26 @@ class GPUTaskAdmin(admin.ModelAdmin):
 
     def color_status(self, obj):
         if obj.status == -2:
-            status = '未就绪'
+            status = 'Not Ready'
             color_code = 'gray'
         elif obj.status == -1:
-            status = '运行失败'
+            status = 'Failed'
             color_code = 'red'
         elif obj.status == 0:
-            status = '准备就绪'
+            status = 'Ready'
             color_code = 'blue'
         elif obj.status == 1:
-            status = '运行中'
+            status = 'Running'
             color_code = '#ecc849'
         elif obj.status == 2:
-            status = '已完成'
+            status = 'Finished'
             color_code = 'green'
         else:
-            status = '未知状态'
+            status = 'None'
             color_code = 'red'
         return format_html('<span style="color:{};">{}</span>', color_code, status)
 
-    color_status.short_description = '状态'
+    color_status.short_description = 'status'
     color_status.admin_order_field = 'status'
 
     def delete_queryset(self, request, queryset):
@@ -122,7 +122,7 @@ class GPUTaskAdmin(admin.ModelAdmin):
             )
             new_task.save()
 
-    copy_task.short_description = '复制任务'
+    copy_task.short_description = 'Copy Task'
     copy_task.icon = 'el-icon-document-copy'
     copy_task.type = 'success'
 
@@ -131,7 +131,7 @@ class GPUTaskAdmin(admin.ModelAdmin):
             task.status = 0
             task.save()
 
-    restart_task.short_description = '重新开始'
+    restart_task.short_description = 'Restart'
     restart_task.icon = 'el-icon-refresh-left'
     restart_task.type = 'success'
 
@@ -166,20 +166,20 @@ class GPUTaskRunningLogAdmin(admin.ModelAdmin):
 
     def color_status(self, obj):
         if obj.status == -1:
-            status = '运行失败'
+            status = 'Failed'
             color_code = 'red'
         elif obj.status == 1:
-            status = '运行中'
+            status = 'Runing'
             color_code = '#ecc849'
         elif obj.status == 2:
-            status = '已完成'
+            status = 'Finished'
             color_code = 'green'
         else:
-            status = '未知状态'
+            status = 'None'
             color_code = 'red'
         return format_html('<span style="color:{};">{}</span>', color_code, status)
 
-    color_status.short_description = '状态'
+    color_status.short_description = 'status'
     color_status.admin_order_field = 'status'
 
     def log(self, obj):
@@ -189,14 +189,14 @@ class GPUTaskRunningLogAdmin(admin.ModelAdmin):
         except Exception:
             return 'Error: Cannot open log file'
 
-    log.short_description = '日志'
+    log.short_description = 'log'
 
     def kill_button(self, request, queryset):
         for running_task in queryset:
             if running_task.status == 1:
                 running_task.kill()
 
-    kill_button.short_description = '结束进程'
+    kill_button.short_description = 'End Task'
     kill_button.icon = 'el-icon-error'
     kill_button.type = 'danger'
-    kill_button.confirm = '是否执意结束选中进程？'
+    kill_button.confirm = 'Still End?'

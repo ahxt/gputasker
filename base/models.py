@@ -9,8 +9,8 @@ class UserConfig(models.Model):
     server_private_key_path = models.FilePathField(path='private_key', verbose_name="私钥文件", blank=True, null=True)
 
     class Meta:
-        verbose_name = '用户设置'
-        verbose_name_plural = '用户设置'
+        verbose_name = 'User Setting'
+        verbose_name_plural = 'User Setting'
 
 
 class SystemConfig(models.Model):
@@ -18,5 +18,5 @@ class SystemConfig(models.Model):
     gpustat_path = models.CharField('gpustat路径', max_length=100)
 
     class Meta:
-        verbose_name = '系统设置'
-        verbose_name_plural = '系统设置'
+        verbose_name = 'System Setting'
+        verbose_name_plural = 'System Setting'

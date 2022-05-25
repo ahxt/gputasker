@@ -18,8 +18,8 @@ from django.urls import path
 from django.shortcuts import redirect
 
 
-admin.site.site_header = 'GPU任务管理平台'
-admin.site.site_title = 'GPU任务管理平台'
+admin.site.site_header = 'GPU'
+admin.site.site_title = 'GPU'
 
 
 def index_view(request):
