@@ -3,6 +3,7 @@
 轻量好用的GPU机群任务调度工具
 
 [![simpleui](https://img.shields.io/badge/developing%20with-Simpleui-2077ff.svg)](https://github.com/newpanjing/simpleui)
+[![docker build](https://github.com/cnstark/gputasker/actions/workflows/docker-build.yml/badge.svg)](https://hub.docker.com/r/cnstark/gputasker)
 
 ## 介绍
 
@@ -16,26 +17,17 @@ GPU Tasker是一款GPU任务调度工具，适用于GPU机群或单机环境，�
 
 在机群环境下，将GPU Tasker安装在机群环境下的一台服务器或PC，安装GPU Tasker的服务器成为Master，其余服务器称为Node，Master可以通过ssh连接所有Node服务器。**建议Node服务器连接NAS或拥有共享目录，并连接LDAP。**
 
-* Master
-
 安装django、django-simpleui
 
 ```shell
 pip install django django-simpleui
 ```
 
-* Node
-
-安装gpustat（所有Node服务器安装在相同位置或NAS目录下。暂不支持每个服务器自定义gpustat路径，后续版本迭代可能会支持。）
-
-```shell
-pip install gpustat
-which gpustat  # 查看gpustat路径，稍后会使用
-```
-
 ### 部署GPU Tasker
 
-由于开发时间有限，尚未支持一键部署，后续版本迭代会逐步支持。部署环节建议有django基础
+GPU Tasker支持手动部署与Docker部署。
+
+#### 手动部署
 
 * 在Master服务器clone本项目
 
@@ -64,10 +56,43 @@ python manage.py createsuperuser
 * 启动服务
 
 ```shell
-python manage.py runserver 0:8888
+python manage.py runserver --insecure 0.0.0.0:8888
 ```
 
-* 基本设置
+* 启动主进程
+
+```shell
+python main.py
+```
+
+#### Docker部署
+
+* 安装[Docker](https://docs.docker.com/get-docker/)与[docker-compose](https://docs.docker.com/compose/install/)
+
+* 在Master服务器clone本项目
+
+```shell
+git clone https://github.com/cnstark/gputasker.git
+cd gputasker
+```
+
+* 启动GPUTasker
+
+```shell
+sudo docker-compose up -d
+```
+
+* 创建超级用户
+
+注意：初次使用时需要等待初始化完成后才能创建超级用户，等待时间约30秒。当`http://your_server:8888/admin`可以正常访问后再执行：
+
+```shell
+sudo docker exec -it gputasker_django python manage.py createsuperuser
+```
+
+根据提示输入信息，完成创建。
+
+### 基本设置
 
 访问`http://your_server:8888/admin`，登录管理后台。
 
@@ -78,16 +103,6 @@ python manage.py runserver 0:8888
 暂只支持每个服务器使用相同的用户名，后续版本迭代可能会支持。
 
 ![home](.assets/user_config.png)
-
-添加`系统设置`，选择系统管理员，填写gpustat路径。GPU Tasker会使用系统管理员的用户登录Node服务器，执行gpustat获取GPU状态，因此系统管理员用户需要与安装gpustat的用户一致。
-
-![home](.assets/system_config.png)
-
-* 启动主进程
-
-```shell
-python main.py
-```
 
 ### 添加Node节点
 

@@ -9,6 +9,7 @@ class UserConfig(models.Model):
     server_private_key_path = models.FilePathField(path='private_key', verbose_name="私钥文件", blank=True, null=True)
 
     class Meta:
+<<<<<<< HEAD
         verbose_name = 'User Setting'
         verbose_name_plural = 'User Setting'
 
@@ -20,3 +21,7 @@ class SystemConfig(models.Model):
     class Meta:
         verbose_name = 'System Setting'
         verbose_name_plural = 'System Setting'
+=======
+        verbose_name = '用户设置'
+        verbose_name_plural = '用户设置'
+>>>>>>> 36f4a7232af19c7211cd15be2b0125393802b21d

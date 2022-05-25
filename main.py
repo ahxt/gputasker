@@ -1,9 +1,5 @@
 import os
-import signal
-import subprocess
-import json
 import time
-from datetime import datetime
 import threading
 import logging
 import os
@@ -16,7 +12,6 @@ django.setup()
 from base.utils import get_admin_config
 from task.models import GPUTask
 from task.utils import run_task
-from gpu_info.models import GPUServer
 from gpu_info.utils import GPUInfoUpdater
 
 
@@ -34,10 +29,8 @@ task_logger = logging.getLogger('django.task')
 
 
 if __name__ == '__main__':
-    server_username, server_private_key_path, gpustat_path = get_admin_config()
-
-    gpu_updater = GPUInfoUpdater(server_username, gpustat_path, server_private_key_path)
     while True:
+<<<<<<< HEAD
 
         try:
             task_logger.info('Running processes: {:d}'.format(threading.active_count()-1))
@@ -123,3 +116,29 @@ if __name__ == '__main__':
                 time.sleep(10 - duration)
         except Exception as e:
             print( e )
+=======
+        start_time = time.time()
+        try:
+            server_username, server_private_key_path = get_admin_config()
+            gpu_updater = GPUInfoUpdater(server_username, server_private_key_path)
+
+            task_logger.info('Running processes: {:d}'.format(
+                threading.active_count() - 1
+            ))
+
+            gpu_updater.update_gpu_info()
+            for task in GPUTask.objects.filter(status=0):
+                available_server = task.find_available_server()
+                if available_server is not None:
+                    t = threading.Thread(target=run_task, args=(task, available_server))
+                    t.start()
+                    time.sleep(5)
+        except Exception as e:
+            task_logger.error(str(e))
+        finally:
+            end_time = time.time()
+            # 确保至少间隔十秒，减少服务器负担
+            duration = end_time - start_time
+            if duration < 10:
+                time.sleep(10 - duration)
+>>>>>>> 36f4a7232af19c7211cd15be2b0125393802b21d
